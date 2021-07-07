@@ -1,7 +1,15 @@
-import express from 'express';
+import express, { Router } from 'express';
 
 const app = express();
 
-app.listen(3000, ()=>{
-    console.log("Server started on port 3000")
-})
+
+////////////////////////////////////////////////////////////////
+// Server configuration
+////////////////////////////////////////////////////////////////
+const router = Router();
+
+app.use(express.json());
+app.use(router);
+
+
+export default app;
