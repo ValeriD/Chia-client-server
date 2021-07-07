@@ -2,15 +2,23 @@
   "name": "chia-client",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devServer": "nodemon ./src/server.ts"
+    "devServer": "nodemon ./src/index.ts"
+  },
+  "nodemonConfig":{
+    "watch":[
+      "src"
+    ]
   },
   "author": "Valeri Dobrev",
   "license": "ISC",
   "dependencies": {
-    "chia-client": "https://github.com/martin-key/chia-client#master",
+    "chia-client": "git+https://github.com/martin-key/chia-client#master",
+    "dotenv": "^10.0.0",
+    "jet-logger": "^1.0.6",
+    "mongoose": "^5.13.2",
     "nodemon": "^2.0.9",
     "tsc": "^2.0.3"
   },
