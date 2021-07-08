@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Logger from "jet-logger";
+import HttpException from "../exceptions/http.exception";
 import * as fullNodeService from "../services/full.node.service"
 
 export async function getBlockchainState(req:Request, res:Response, next:NextFunction)  {
@@ -10,11 +11,14 @@ export async function getBlockchainState(req:Request, res:Response, next:NextFun
 
 export async function getBlock(req: Request, res:Response, next:NextFunction){
     if(!req.body.hash){
-        //TODO throw 400
+        next(new HttpException(400, "No hash provided"));
     }
     await fullNodeService.getBlockByHash(req.body.hash)
         .then((data) => {res.json(data)})
-        .catch(err => {Logger.Err(err); next});
+        .catch(err => {
+            Logger.Err(err.message); 
+            next(new HttpException(500, err.message))
+        });
 }
 
 export async function getBlockRecord(req: Request, res:Response, next:NextFunction){
@@ -26,50 +30,64 @@ export async function getBlockRecord(req: Request, res:Response, next:NextFuncti
             await fullNodeService.getBlockRecordByHeight(req.body.height)
                 .then((data) => {res.json(data)});
         }else{
-            //TODO throw 400
+            throw new HttpException(400, "Neither hash, nor height provided");
         }
     }catch(exception){
-        //TODO next error 
+        Logger.Err(exception.message);
+        next(exception);
     }
 }
 
 export async function getUnfinishedBlockHeaders(req: Request, res:Response, next:NextFunction) {
     if(!req.body.height){
-        //TODO throw 400
+        next(new HttpException(400, "No height provided"));
     }
 
     await fullNodeService.getUnfinishedBlockHeaders(req.body.height)
         .then(data => {res.json(data)})
-        .catch(err => {res.json(err)});
+        .catch(err => {
+            Logger.Err(err); 
+            next(new HttpException(500, err.message))
+        });
 }
 
 export async function getUnspentCoins(req: Request, res:Response, next:NextFunction) {
     if(!req.body.puzzleHash){
-        //TODO throw 400
+        next(new HttpException(400, "No puzzle hash provided"));
     }
 
     await fullNodeService.getUnspentCoins(req.body.puzzleHash)
         .then(data => {res.json(data)})
-        .catch(err => {res.json(err)});
+        .catch(err => {
+            Logger.Err(err); 
+            next(new HttpException(500, err.message))
+        });
 }
 
 export async function getCoinRecord(req: Request, res:Response, next:NextFunction){
     if(!req.body.name){
-        //TODO throw 400
+        next(new HttpException(400, "No name provided"));
     }
     await fullNodeService.getCoinRecordByName(req.body.name)
         .then(data => {res.json(data)})
-        .catch(err => {res.json(err)});
+        .catch(err => {
+            Logger.Err(err); 
+            next(new HttpException(500, err.message))
+        });
 }
 
 export async function getAdditionsAndRemovals(req: Request, res:Response, next:NextFunction){
 
     if(!req.body.hash){
-        //TODO throw 400
+        next(new HttpException(400, "No hash provided"));
     }
 
     await fullNodeService.getAdditionsAndRemovals(req.body.hash)
-        .then(data => {res.json(data)});
+        .then(data => {res.json(data)})
+        .catch(err => {
+            Logger.Err(err); 
+            next(new HttpException(500, err.message))
+        });
 }
 
 
