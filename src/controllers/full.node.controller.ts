@@ -21,6 +21,19 @@ export async function getBlock(req: Request, res:Response, next:NextFunction){
         });
 }
 
+export async function getBlocks(req: Request, res:Response, next:NextFunction){
+    if(!req.body.startHeight || !req.body.endHeight){
+        next(new HttpException(400, "Start height or end height not provided"));
+    }
+
+    await fullNodeService.getBlocks(req.body.startHeight, req.body.endHeight)
+        .then(data => {res.json(data)})
+        .catch(err => {
+            Logger.Err(err.message); 
+            next(new HttpException(500, err.message))
+        });
+}
+
 export async function getBlockRecord(req: Request, res:Response, next:NextFunction){
     try{
         if(req.body.hash){

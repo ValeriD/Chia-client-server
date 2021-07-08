@@ -12,6 +12,10 @@ export async function getBlockchainState(){
     return state;
 }
 
+export async function getBlocks(startHeight: number, endHeight: number){
+    return await fullNode.getBlocks(startHeight, endHeight);
+}
+
 export async function getBlockByHash(hash:string){
     return await fullNode.getBlock(hash);
 }
