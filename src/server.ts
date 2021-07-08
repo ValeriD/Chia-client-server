@@ -1,4 +1,5 @@
-import express, { Router } from 'express';
+import express from 'express';
+import routes from './routes/routes';
 
 const app = express();
 
@@ -6,10 +7,8 @@ const app = express();
 ////////////////////////////////////////////////////////////////
 // Server configuration
 ////////////////////////////////////////////////////////////////
-const router = Router();
 
 app.use(express.json());
-app.use(router);
-
+app.use(routes);
 
 export default app;
