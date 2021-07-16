@@ -1,4 +1,3 @@
-import { FullNode } from "chia-client";
 import Logger from "jet-logger"
 import { Server } from "./config/config";
 import app from "./server"
