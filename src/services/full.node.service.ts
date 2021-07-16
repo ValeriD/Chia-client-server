@@ -1,9 +1,12 @@
-import { FullNode } from "chia-client";
+import { FullNode, Wallet } from "chia-client";
+import { config } from "dotenv";
+import Logger from "jet-logger/lib/Logger";
+import { Server } from "../config/config";
 
 
 const fullNode = new FullNode({
     protocol: 'https',
-    hostname: 'localhost',
+    hostname: Server.host,
     port: 8855
 });
 
