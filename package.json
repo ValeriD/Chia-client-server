@@ -5,7 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devServer": "nodemon ./src/index.ts"
+    "devServer": "nodemon ./src/index.ts",
+    "start":"ts-node dist/index.js",
+    "build": "tsc --p ./"
   },
   "nodemonConfig": {
     "watch": [
@@ -15,6 +17,7 @@
   "author": "Valeri Dobrev",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^16.3.3",
     "chia-client": "git+https://github.com/martin-key/chia-client#master",
     "jet-logger": "^1.0.6",
     "mongoose": "^5.13.2",
