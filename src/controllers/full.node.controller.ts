@@ -10,10 +10,11 @@ export async function getBlockchainState(req:Request, res:Response, next:NextFun
 }
 
 export async function getBlock(req: Request, res:Response, next:NextFunction){
-    if(!req.body.hash){
+    if(!req.query.hash){
         next(new HttpException(400, "No hash provided"));
     }
-    await fullNodeService.getBlockByHash(req.body.hash)
+    const hash:string = req.query.hash?.toString() || "";
+    await fullNodeService.getBlockByHash(hash)
         .then((data) => {res.json(data)})
         .catch(err => {
             Logger.Err(err.message); 
@@ -22,11 +23,12 @@ export async function getBlock(req: Request, res:Response, next:NextFunction){
 }
 
 export async function getBlocks(req: Request, res:Response, next:NextFunction){
-    if(!req.body.startHeight || !req.body.endHeight){
+    if(!req.query.startHeight || !req.query.endHeight){
         next(new HttpException(400, "Start height or end height not provided"));
     }
-
-    await fullNodeService.getBlocks(req.body.startHeight, req.body.endHeight)
+    const startHeight:number = parseInt(req.query.startHeight?.toString() || "");
+    const endHeight:number = parseInt(req.query.startHeight?.toString() || "");
+    await fullNodeService.getBlocks(startHeight, endHeight)
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err.message); 
@@ -36,11 +38,16 @@ export async function getBlocks(req: Request, res:Response, next:NextFunction){
 
 export async function getBlockRecord(req: Request, res:Response, next:NextFunction){
     try{
-        if(req.body.hash){
-            await fullNodeService.getBlockRecordByHash(req.body.hash)
+        if(req.query.hash){
+            const hash:string = req.query.hash?.toString() || "";
+            await fullNodeService.getBlockRecordByHash(hash)
                 .then(data => {res.json(data)});
-        }else if(req.body.height){
-            await fullNodeService.getBlockRecordByHeight(req.body.height)
+
+        }else if(req.query.height){
+
+            const height:number = parseInt(req.query.height?.toString() || "");
+
+            await fullNodeService.getBlockRecordByHeight(height)
                 .then((data) => {res.json(data)});
         }else{
             throw new HttpException(400, "Neither hash, nor height provided");
@@ -52,11 +59,12 @@ export async function getBlockRecord(req: Request, res:Response, next:NextFuncti
 }
 
 export async function getUnfinishedBlockHeaders(req: Request, res:Response, next:NextFunction) {
-    if(!req.body.height){
+    if(!req.query.height){
         next(new HttpException(400, "No height provided"));
     }
 
-    await fullNodeService.getUnfinishedBlockHeaders(req.body.height)
+    const height:number = parseInt(req.query.height?.toString() || "");
+    await fullNodeService.getUnfinishedBlockHeaders(height)
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
@@ -65,11 +73,12 @@ export async function getUnfinishedBlockHeaders(req: Request, res:Response, next
 }
 
 export async function getUnspentCoins(req: Request, res:Response, next:NextFunction) {
-    if(!req.body.puzzleHash){
+    if(!req.query.puzzleHash){
         next(new HttpException(400, "No puzzle hash provided"));
     }
 
-    await fullNodeService.getUnspentCoins(req.body.puzzleHash)
+    const puzzleHash:string = req.query.puzzleHash?.toString() || "";
+    await fullNodeService.getUnspentCoins(puzzleHash)
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
@@ -78,10 +87,13 @@ export async function getUnspentCoins(req: Request, res:Response, next:NextFunct
 }
 
 export async function getCoinRecord(req: Request, res:Response, next:NextFunction){
-    if(!req.body.name){
+    if(!req.query.name){
         next(new HttpException(400, "No name provided"));
     }
-    await fullNodeService.getCoinRecordByName(req.body.name)
+
+    const name: string = req.query.name?.toString() || "";
+
+    await fullNodeService.getCoinRecordByName(name)
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
@@ -91,18 +103,16 @@ export async function getCoinRecord(req: Request, res:Response, next:NextFunctio
 
 export async function getAdditionsAndRemovals(req: Request, res:Response, next:NextFunction){
 
-    if(!req.body.hash){
+    if(!req.query.hash){
         next(new HttpException(400, "No hash provided"));
     }
 
-    await fullNodeService.getAdditionsAndRemovals(req.body.hash)
+    const hash: string = req.query.hash?.toString() || "";
+    await fullNodeService.getAdditionsAndRemovals(hash)
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
             next(new HttpException(500, err.message))
         });
 }
-
-
-
 
