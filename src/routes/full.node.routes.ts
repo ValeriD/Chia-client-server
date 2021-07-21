@@ -43,4 +43,10 @@ fullNode.get('/get_coin_record', fullNodeController.getCoinRecord);
  */
 fullNode.get('/get_additions_and_removals', fullNodeController.getAdditionsAndRemovals)
 
+fullNode.get('/get_coin_info', fullNodeController.getCoinInfo);
+
+fullNode.get('/puzzleHash_to_address', fullNodeController.puzzleHashToAddress);
+
+fullNode.get('/address_to_puzzleHash', fullNodeController.addressToPuzzleHash);
+
 export default fullNode;

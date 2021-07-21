@@ -27,7 +27,9 @@ export async function getBlocks(req: Request, res:Response, next:NextFunction){
         next(new HttpException(400, "Start height or end height not provided"));
     }
     const startHeight:number = parseInt(req.query.startHeight?.toString() || "");
-    const endHeight:number = parseInt(req.query.startHeight?.toString() || "");
+    
+    const endHeight:number = parseInt(req.query.endHeight?.toString() || "");
+
     await fullNodeService.getBlocks(startHeight, endHeight)
         .then(data => {res.json(data)})
         .catch(err => {
@@ -68,7 +70,7 @@ export async function getUnfinishedBlockHeaders(req: Request, res:Response, next
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
-            next(new HttpException(500, err.message))
+            next(new HttpException(500, err))
         });
 }
 
@@ -82,7 +84,7 @@ export async function getUnspentCoins(req: Request, res:Response, next:NextFunct
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
-            next(new HttpException(500, err.message))
+            next(new HttpException(500, err))
         });
 }
 
@@ -97,7 +99,7 @@ export async function getCoinRecord(req: Request, res:Response, next:NextFunctio
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
-            next(new HttpException(500, err.message))
+            next(new HttpException(500, err))
         });
 }
 
@@ -112,7 +114,44 @@ export async function getAdditionsAndRemovals(req: Request, res:Response, next:N
         .then(data => {res.json(data)})
         .catch(err => {
             Logger.Err(err); 
-            next(new HttpException(500, err.message))
+            next(new HttpException(500, err))
         });
 }
 
+export async function puzzleHashToAddress(req: Request, res:Response, next:NextFunction){
+    
+    if(!req.query.puzzleHash){
+        next(new HttpException(400, "No hash provided"));
+    }
+
+    const puzzleHash = req.query.puzzleHash?.toString() || "";
+
+    await fullNodeService.convertPuzzleHashToAddress(puzzleHash)
+        .then(data => {res.send({"address":data})})
+        .catch(err => {next(new HttpException(500, err))});
+}
+
+export async function addressToPuzzleHash(req: Request, res:Response, next:NextFunction){
+    if(!req.query.address){
+        next(new HttpException(400, "No address provided"));
+    }
+    const address:string = req.query.address?.toString() || "";
+
+    await fullNodeService.convertAddressToPuzzleHash(address)
+        .then(data => {res.status(200).send({"puzzleHash":data})})
+        .catch(err => {next(new HttpException(500, err))});
+}
+
+export async function getCoinInfo(req: Request, res:Response, next:NextFunction){
+    if(!req.query.parentCoinInfo || !req.query.puzzleHash || !req.query.amount){
+        next(new HttpException(400, "Not provided parent coin info, puzzle hash or amount!"));
+    }
+
+    const parentCoinInfo:string = req.query.parentCoinInfo?.toString() || "";
+    const puzzleHash: string = req.query.puzzleHash?.toString() || "";
+    const amount: number = parseInt(req.query.amount?.toString() || "");
+
+    await fullNodeService.getCoinInfo(parentCoinInfo, puzzleHash, amount)
+        .then(data => {res.json(data)})
+        .catch(err => next(new HttpException(500, err)));
+}

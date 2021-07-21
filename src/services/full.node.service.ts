@@ -1,8 +1,6 @@
-import { FullNode, Wallet } from "chia-client";
-import { config } from "dotenv";
-import Logger from "jet-logger/lib/Logger";
+import { FullNode } from "chia-client";
 import { Server } from "../config/config";
-
+import HttpException from "../exceptions/http.exception";
 
 const fullNode = new FullNode({
     protocol: 'https',
@@ -46,3 +44,20 @@ export async function getCoinRecordByName(name: string){
 export async function getAdditionsAndRemovals(hash: string){
     return await fullNode.getAdditionsAndRemovals(hash);
 }
+
+export async function convertPuzzleHashToAddress(hash: string) {
+    
+    return await fullNode.puzzleHashToAddress(hash);
+}
+
+export async function convertAddressToPuzzleHash(address: string) {
+    const hash = fullNode.addressToPuzzleHash(address)
+    if(hash.length===0){
+       throw new HttpException(500, "Empty hash")
+    }
+    return hash;
+}
+export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, amount: number) {
+    return await fullNode.getCoinInfo(parentCoinInfo, puzzleHash, amount);
+}
+
