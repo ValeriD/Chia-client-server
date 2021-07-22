@@ -54,7 +54,7 @@ export async function checkForNewTransactions(){
             }
         }
         start = tempEnd+1;  
-        tempEnd+=100;
+        tempEnd+= (end - tempEnd<100)? (end-tempEnd) : 100;
     }
 }
 
