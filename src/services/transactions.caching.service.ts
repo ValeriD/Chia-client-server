@@ -24,7 +24,7 @@ async function serializeTransaction(coinBlock:any):Promise<ITransaction>{
 }
 
 async function getLastRecordHeight(){
-    const lastTransaction:ITransaction | null = await Transaction.findOne().sort('-creationHeight');
+    const lastTransaction:ITransaction | null = await Transaction.findOne().sort({'creation_height':-1});
 
     if(!lastTransaction){
         return -1;
@@ -39,6 +39,8 @@ async function getLastRecordHeight(){
 export async function checkForNewTransactions(){
     const end = (await fullNodeService.getBlockchainState()).blockchain_state.peak.height;
     let start = await getLastRecordHeight()+1;
+
+    console.log(start);
 
     let tempEnd = (end<100)? end : start+100;
 
