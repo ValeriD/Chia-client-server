@@ -61,3 +61,7 @@ export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, am
     return await fullNode.getCoinInfo(parentCoinInfo, puzzleHash, amount);
 }
 
+export async function getBlocksInRange(start:number, end:number){
+    return await fullNode.getBlocks(start, end);
+}
+
