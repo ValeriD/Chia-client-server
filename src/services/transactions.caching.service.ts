@@ -27,7 +27,7 @@ async function getLastRecordHeight(){
     const lastTransaction:ITransaction | null = await Transaction.findOne().sort({'creation_height':-1});
 
     if(!lastTransaction){
-        return -1;
+        return 0;
     }else{
         return lastTransaction.creation_height;
     }
@@ -37,24 +37,23 @@ async function getLastRecordHeight(){
  * Then is called the addNewTransaction with the block hash that gets all additions and saves them in the database
  */
 export async function checkForNewTransactions(){
-    const end = (await fullNodeService.getBlockchainState()).blockchain_state.peak.height;
-    let start = await getLastRecordHeight()+1;
+    const end = (await fullNodeService.getBlockchainState()).blockchain_state.peak.height +1;
+    let start = await getLastRecordHeight();
 
-    console.log(start);
-
-    let tempEnd = (end<100)? end : start+100;
+    let tempEnd = (end-start<100)? end : start+100;
 
     //To work with smaller payload process all blocks 100 at a time
-    while(tempEnd<=end){
+    while(tempEnd <= end){
         const blocks = (await fullNodeService.getBlocksInRange(start,tempEnd)).blocks;
-
+        
         for(let block of blocks){
             if(block.reward_chain_block.is_transaction_block){
                 await addNewTransaction(block.header_hash)
             }
         }
-        start = tempEnd+1;  
-        tempEnd+= (end - tempEnd<100)? (end-tempEnd) : 100;
+        start = tempEnd; 
+         
+        tempEnd+= (end - tempEnd<100 && end-tempEnd>0)? (end-tempEnd) : 100;
     }
 }
 
