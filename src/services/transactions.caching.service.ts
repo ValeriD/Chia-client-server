@@ -32,6 +32,15 @@ async function getLastRecordHeight(){
         return lastTransaction.creation_height;
     }
 }
+
+async function addNewTransaction(hash:any){
+    const additions = (await fullNodeService.getAdditionsAndRemovals(hash)).additions
+
+    for(let addition of additions){
+        await addTransaction(addition);
+    }
+}
+
 /**
  * Retrieving the blocks from the last cached and then checking which one has transactions
  * Then is called the addNewTransaction with the block hash that gets all additions and saves them in the database
@@ -54,13 +63,5 @@ export async function checkForNewTransactions(){
         start = tempEnd; 
          
         tempEnd+= (end - tempEnd<100 && end-tempEnd>0)? (end-tempEnd) : 100;
-    }
-}
-
-async function addNewTransaction(hash:any){
-    const additions = (await fullNodeService.getAdditionsAndRemovals(hash)).additions
-
-    for(let addition of additions){
-        await addTransaction(addition);
     }
 }
