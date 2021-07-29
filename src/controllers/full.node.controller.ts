@@ -17,8 +17,7 @@ export async function getBlock(req: Request, res:Response, next:NextFunction){
     await fullNodeService.getBlockByHash(hash)
         .then((data) => {res.json(data)})
         .catch(err => {
-            Logger.Err(err.message); 
-            next(new HttpException(500, err.message))
+            next(err)
         });
 }
 
@@ -33,8 +32,7 @@ export async function getBlocks(req: Request, res:Response, next:NextFunction){
     await fullNodeService.getBlocks(startHeight, endHeight)
         .then(data => {res.json(data)})
         .catch(err => {
-            Logger.Err(err.message); 
-            next(new HttpException(500, err.message))
+            next(err)
         });
 }
 
@@ -55,7 +53,6 @@ export async function getBlockRecord(req: Request, res:Response, next:NextFuncti
             throw new HttpException(400, "Neither hash, nor height provided");
         }
     }catch(exception){
-        Logger.Err(exception.message);
         next(exception);
     }
 }
@@ -69,8 +66,7 @@ export async function getUnfinishedBlockHeaders(req: Request, res:Response, next
     await fullNodeService.getUnfinishedBlockHeaders(height)
         .then(data => {res.json(data)})
         .catch(err => {
-            Logger.Err(err); 
-            next(new HttpException(500, err))
+            next(err)
         });
 }
 
@@ -83,8 +79,7 @@ export async function getUnspentCoins(req: Request, res:Response, next:NextFunct
     await fullNodeService.getUnspentCoins(puzzleHash)
         .then(data => {res.json(data)})
         .catch(err => {
-            Logger.Err(err); 
-            next(new HttpException(500, err))
+            next(err)
         });
 }
 
@@ -98,8 +93,7 @@ export async function getCoinRecord(req: Request, res:Response, next:NextFunctio
     await fullNodeService.getCoinRecordByName(name)
         .then(data => {res.json(data)})
         .catch(err => {
-            Logger.Err(err); 
-            next(new HttpException(500, err))
+            next(err)
         });
 }
 
@@ -113,8 +107,7 @@ export async function getAdditionsAndRemovals(req: Request, res:Response, next:N
     await fullNodeService.getAdditionsAndRemovals(hash)
         .then(data => {res.json(data)})
         .catch(err => {
-            Logger.Err(err); 
-            next(new HttpException(500, err))
+            next(err)
         });
 }
 
@@ -139,7 +132,9 @@ export async function addressToPuzzleHash(req: Request, res:Response, next:NextF
 
     await fullNodeService.convertAddressToPuzzleHash(address)
         .then(data => {res.status(200).send({"puzzleHash":data})})
-        .catch(err => {next(new HttpException(500, err))});
+        .catch(err => { 
+            next(err)
+        });
 }
 
 export async function getCoinInfo(req: Request, res:Response, next:NextFunction){
@@ -153,5 +148,7 @@ export async function getCoinInfo(req: Request, res:Response, next:NextFunction)
 
     await fullNodeService.getCoinInfo(parentCoinInfo, puzzleHash, amount)
         .then(data => {res.json(data)})
-        .catch(err => next(new HttpException(500, err)));
+        .catch(err => {
+            next(err)
+        });
 }

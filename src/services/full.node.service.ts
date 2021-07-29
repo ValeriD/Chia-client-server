@@ -1,48 +1,56 @@
 import { FullNode } from "chia-client";
 import { Server } from "../config/config";
+import { FullNodeConnection } from "../connections/full-node.connection";
 import HttpException from "../exceptions/http.exception";
 
-const fullNode = new FullNode({
-    protocol: 'https',
-    hostname: Server.host,
-    port: 8855
-});
+const fullNode = FullNodeConnection.getInstance().getFullNode();
 
 export async function getBlockchainState(){
-    const state = await fullNode.getBlockchainState();
-    return state;
+    return await fullNode.getBlockchainState()
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getBlocks(startHeight: number, endHeight: number){
-    return await fullNode.getBlocks(startHeight, endHeight);
+    return await fullNode.getBlocks(startHeight, endHeight)
+        .catch(err => {throw new HttpException(500, err.message)});
+
 }
 
 export async function getBlockByHash(hash:string){
-    return await fullNode.getBlock(hash);
+    return await fullNode.getBlock(hash)
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getBlockRecordByHeight(height:number){
-    return await fullNode.getBlockRecordByHeight(height);
+    return await fullNode.getBlockRecordByHeight(height)
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getBlockRecordByHash(hash:string){
-    return await fullNode.getBlockRecord(hash);
+    return await fullNode.getBlockRecord(hash)
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getUnfinishedBlockHeaders(height: number){
-    return await fullNode.getUnfinishedBlockHeaders(height);
+    return await fullNode.getUnfinishedBlockHeaders(height)
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getUnspentCoins(puzzleHash:string){
-    return await fullNode.getUnspentCoins(puzzleHash);
+    return await fullNode.getUnspentCoins(puzzleHash)
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getCoinRecordByName(name: string){
-    return await fullNode.getCoinRecordByName(name);
+    return await fullNode.getCoinRecordByName(name)
+        .catch(err => {throw new HttpException(500, err.message)});
+
 }
 
 export async function getAdditionsAndRemovals(hash: string){
-    return await fullNode.getAdditionsAndRemovals(hash);
+    return await fullNode.getAdditionsAndRemovals(hash)
+        .catch(err => {throw new HttpException(500, err.message)});
+
 }
 
 export async function convertPuzzleHashToAddress(hash: string) {
@@ -58,10 +66,15 @@ export async function convertAddressToPuzzleHash(address: string) {
     return hash;
 }
 export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, amount: number) {
-    return await fullNode.getCoinInfo(parentCoinInfo, puzzleHash, amount);
+
+    const res =  fullNode.getCoinInfo(parentCoinInfo, puzzleHash, amount)
+    if(!res || res === ''){
+        throw new HttpException(500, "Connection refused");
+    }
 }
 
 export async function getBlocksInRange(start:number, end:number){
-    return await fullNode.getBlocks(start, end);
+    return await fullNode.getBlocks(start, end)
+        .catch(err => {throw new HttpException(500, err.message)});
 }
 
