@@ -6,7 +6,8 @@ const connectToDatabase = () =>{
     mongoose.connect(
         'mongodb://'+ DB.host+"/"+DB.name,{
             useNewUrlParser:true,
-            useUnifiedTopology:true
+            useUnifiedTopology:true,
+            useCreateIndex:true
         },
         () => {
             Logger.Info("Connected to database");

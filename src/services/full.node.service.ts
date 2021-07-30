@@ -71,6 +71,7 @@ export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, am
     if(!res || res === ''){
         throw new HttpException(500, "Connection refused");
     }
+    return res;
 }
 
 export async function getBlocksInRange(start:number, end:number){
