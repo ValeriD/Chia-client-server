@@ -1,24 +1,26 @@
+import { CoinRecord } from "chia-client/dist/src/types/FullNode/CoinRecord";
 import Logger from "jet-logger";
 import HttpException from "../exceptions/http.exception";
 import Transaction, { ITransaction } from "../models/transaction.model";
 import * as fullNodeService from "./full.node.service"
 
-async function addTransaction(coinBlock:any){
+async function addTransaction(coinBlock: CoinRecord){
     const transaction = await serializeTransaction(coinBlock);
     await transaction.save()
         .catch(err => {throw new HttpException(500, err.message)});
 }
 
-async function serializeTransaction(coinBlock:any):Promise<ITransaction>{
+async function serializeTransaction(coinBlock:CoinRecord):Promise<ITransaction>{
+
     const transaction={
-        coin_info: await fullNodeService.getCoinInfo(coinBlock.coin.parent_coin_info, coinBlock.coin.puzzle_hash, coinBlock.coin.amount),
+        coin_info: await fullNodeService.getCoinInfo(coinBlock.coin.parent_coin_info, coinBlock.coin.puzzle_hash, +coinBlock.coin.amount),
         amount:parseInt(coinBlock.coin.amount),
-        creation_height: parseInt(coinBlock.confirmed_block_index),
+        creation_height: +coinBlock.confirmed_block_index,
         owner_puzzle_hash: coinBlock.coin.puzzle_hash,
         owner_address: (await fullNodeService.convertPuzzleHashToAddress(coinBlock.coin.puzzle_hash)),
         parent_coin: coinBlock.coin.parent_coin_info,
         source: (coinBlock.coinbase)? "Coinbase" : "",
-        creation_time: new Date(coinBlock.timestamp*1000)
+        creation_time: new Date((+coinBlock.timestamp) *1000)
     } 
     return new Transaction(transaction);;
 }
@@ -33,12 +35,23 @@ async function getLastRecordHeight(){
     }
 }
 
-async function addNewTransaction(hash:any){
-    const additions = (await fullNodeService.getAdditionsAndRemovals(hash)).additions
-
+async function addAdditionTransactions(additions:CoinRecord []){
+    if(!additions){
+        throw new HttpException(500, "Additions not found");
+    }
     for(let addition of additions){
         await addTransaction(addition);
     }
+}
+
+async function addRemovalsTransactions(removals:CoinRecord []){
+    if(!removals){
+        throw new HttpException(500, "Removals not found");
+    }
+    for(let removal of removals){
+        await addTransaction(removal);
+    }
+
 }
 
 /**
@@ -57,7 +70,12 @@ export async function checkForNewTransactions(){
         
         for(let block of blocks){
             if(block.reward_chain_block.is_transaction_block){
-                await addNewTransaction(block.header_hash)
+                const transactions = await fullNodeService.getAdditionsAndRemovals(block.header_hash || "");
+                
+                addAdditionTransactions(transactions.additions)
+                    .catch(err => {Logger.Err(err.message)});
+                addRemovalsTransactions(transactions.removals)
+                    .catch(err => {Logger.Err(err.message)});
             }
         }
         start = tempEnd; 

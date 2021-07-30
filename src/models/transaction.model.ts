@@ -15,7 +15,8 @@ export interface ITransaction extends mongoose.Document {
 const transactionSchema = new mongoose.Schema({
     coin_info:{         
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     amount:{            
         type:Number,
