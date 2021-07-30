@@ -71,7 +71,7 @@ export async function checkForNewTransactions(){
         for(let block of blocks){
             if(block.reward_chain_block.is_transaction_block){
                 const transactions = await fullNodeService.getAdditionsAndRemovals(block.header_hash || "");
-                if(transactions.success){
+                if(transactions.success && !transactions.error){
                     await addAdditionTransactions(transactions.additions)
                         .catch(err => {Logger.Err(err.message)});
                     await addRemovalsTransactions(transactions.removals)
