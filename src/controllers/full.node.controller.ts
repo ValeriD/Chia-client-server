@@ -71,11 +71,11 @@ export async function getUnfinishedBlockHeaders(req: Request, res:Response, next
 }
 
 export async function getUnspentCoins(req: Request, res:Response, next:NextFunction) {
-    if(!req.query.puzzleHash){
+    if(!req.query.puzzle_hash){
         next(new HttpException(400, "No puzzle hash provided"));
     }
 
-    const puzzleHash:string = req.query.puzzleHash?.toString() || "";
+    const puzzleHash:string = req.query.puzzle_hash?.toString() || "";
     await fullNodeService.getUnspentCoins(puzzleHash)
         .then(data => {res.json(data)})
         .catch(err => {
@@ -84,13 +84,13 @@ export async function getUnspentCoins(req: Request, res:Response, next:NextFunct
 }
 
 export async function getCoinRecord(req: Request, res:Response, next:NextFunction){
-    if(!req.query.name){
+    if(!req.query.coin_info){
         next(new HttpException(400, "No name provided"));
     }
 
-    const name: string = req.query.name?.toString() || "";
+    const coinInfo: string = req.query.coin_info?.toString() || "";
 
-    await fullNodeService.getCoinRecordByName(name)
+    await fullNodeService.getCoinRecord(coinInfo)
         .then(data => {res.json(data)})
         .catch(err => {
             next(err)
@@ -138,16 +138,16 @@ export async function addressToPuzzleHash(req: Request, res:Response, next:NextF
 }
 
 export async function getCoinInfo(req: Request, res:Response, next:NextFunction){
-    if(!req.query.parentCoinInfo || !req.query.puzzleHash || !req.query.amount){
+    if(!req.query.parent_coin_info || !req.query.puzzle_hash || !req.query.amount){
         next(new HttpException(400, "Not provided parent coin info, puzzle hash or amount!"));
     }
 
-    const parentCoinInfo:string = req.query.parentCoinInfo?.toString() || "";
-    const puzzleHash: string = req.query.puzzleHash?.toString() || "";
+    const parentCoinInfo:string = req.query.parent_coin_info?.toString() || "";
+    const puzzleHash: string = req.query.puzzle_hash?.toString() || "";
     const amount: number = parseInt(req.query.amount?.toString() || "");
 
     await fullNodeService.getCoinInfo(parentCoinInfo, puzzleHash, amount)
-        .then(data => {res.json(data)})
+        .then(data => {res.send({"coin_info":data})})
         .catch(err => {
             next(err)
         });

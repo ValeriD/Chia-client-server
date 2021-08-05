@@ -41,8 +41,8 @@ export async function getUnspentCoins(puzzleHash:string){
         .catch(err => {throw new HttpException(500, err.message)});
 }
 
-export async function getCoinRecordByName(name: string){
-    return await fullNode.getCoinRecordByName(name)
+export async function getCoinRecord(coin_info: string){
+    return await fullNode.getCoinRecordByName(coin_info)
         .catch(err => {throw new HttpException(500, err.message)});
 
 }
@@ -76,6 +76,11 @@ export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, am
 
 export async function getBlocksInRange(start:number, end:number){
     return await fullNode.getBlocks(start, end)
+        .catch(err => {throw new HttpException(500, err.message)});
+}
+
+export async function getNetworkSpaceBetweenBlocks(oldBlockHash:string, newBlockHash:string){
+    return await fullNode.getNetworkSpace(newBlockHash, oldBlockHash)
         .catch(err => {throw new HttpException(500, err.message)});
 }
 
