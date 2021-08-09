@@ -2,9 +2,13 @@ import HttpException from "../exceptions/http.exception";
 import Transaction from "../models/transaction.model"
 
 export async function getAllTransactions(){
-    const transactions = await Transaction.find({}, '-_id   -__v', {sort:'-creation_height'})
-        .catch(err => {throw new HttpException(500, err.messafe)});
-    return transactions;
+}
+export async function getTransactions(limit: number, offset: number){
+    return await Transaction.find({}, {sort:'-creation_height'})
+        .skip(offset)
+        .limit(limit)
+        .select('transaction_id created_at sender receiver amount')
+        .catch(err => {throw new HttpException(500, err)});
 }
 
 export async function getTransaction(coinInfo: string, creation_height:number){

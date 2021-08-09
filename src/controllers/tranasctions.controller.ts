@@ -3,9 +3,12 @@ import HttpException from "../exceptions/http.exception";
 import * as transactionService from "../services/transactions.service"
 
 export async function getTransactions(req: Request, res: Response, next: NextFunction){
-    await transactionService.getAllTransactions()
+    const limit = +(req.query.limit?.toString() || "");
+    const offset = +(req.query.offset?.toString() || "");
+
+    await transactionService.getTransactions(limit, offset)
         .then(data => res.json(data))
-        .catch(err => next(err));
+        .catch(err => {next(err);});
 }
 
 export async function getTransaction(req: Request, res:Response, next:NextFunction){
