@@ -4,10 +4,10 @@ import Transaction from "../models/transaction.model"
 export async function getAllTransactions(){
 }
 export async function getTransactions(limit: number, offset: number){
-    return await Transaction.find({}, {sort:'-creation_height'})
+    return await Transaction.find({}, {sort:'-confirmation_block'})
         .skip(offset)
         .limit(limit)
-        .select('transaction_id created_at sender receiver amount')
+        .select('created_at sender receiver amount')
         .catch(err => {throw new HttpException(500, err)});
 }
 

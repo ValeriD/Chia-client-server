@@ -2,57 +2,8 @@ import { CoinRecord } from "chia-client/dist/src/types/FullNode/CoinRecord";
 import Logger from "jet-logger";
 import HttpException from "../exceptions/http.exception";
 import Transaction, { ITransaction } from "../models/transaction.model";
+import fullNode from "../routes/full.node.routes";
 import * as fullNodeService from "./full.node.service"
-
-async function addTransaction(coinBlock: CoinRecord){
-    const transaction = await serializeTransaction(coinBlock);
-    await transaction.save()
-        .catch(err => {throw new HttpException(500, err.message)});
-}
-
-async function serializeTransaction(coinBlock:CoinRecord):Promise<ITransaction>{
-
-    const transaction={
-        coin_info: await fullNodeService.getCoinInfo(coinBlock.coin.parent_coin_info, coinBlock.coin.puzzle_hash, +coinBlock.coin.amount),
-        amount:parseInt(coinBlock.coin.amount),
-        creation_height: +coinBlock.confirmed_block_index,
-        owner_puzzle_hash: coinBlock.coin.puzzle_hash,
-        owner_address: (await fullNodeService.convertPuzzleHashToAddress(coinBlock.coin.puzzle_hash)),
-        parent_coin: coinBlock.coin.parent_coin_info,
-        source: (coinBlock.coinbase)? "Coinbase" : "",
-        creation_time: new Date((+coinBlock.timestamp) *1000)
-    } 
-    return new Transaction(transaction);;
-}
-
-async function getLastRecordHeight(){
-    const lastTransaction:ITransaction | null = await Transaction.findOne().sort({'creation_height':-1});
-
-    if(!lastTransaction){
-        return 0;
-    }else{
-        return lastTransaction.creation_height;
-    }
-}
-
-async function addAdditionTransactions(additions:CoinRecord []){
-    if(!additions){
-        throw new HttpException(500, "Additions not found");
-    }
-    for(let addition of additions){
-        await addTransaction(addition);
-    }
-}
-
-async function addRemovalsTransactions(removals:CoinRecord []){
-    if(!removals){
-        throw new HttpException(500, "Removals not found");
-    }
-    for(let removal of removals){
-        await addTransaction(removal);
-    }
-
-}
 
 /**
  * Retrieving the blocks from the last cached and then checking which one has transactions
@@ -74,8 +25,7 @@ export async function checkForNewTransactions(){
                 if(transactions.success && !transactions.error){
                     await addAdditionTransactions(transactions.additions)
                         .catch(err => {Logger.Err(err.message)});
-                    await addRemovalsTransactions(transactions.removals)
-                        .catch(err => {Logger.Err(err.message)});
+                    
                 }
             }
         }
@@ -83,4 +33,62 @@ export async function checkForNewTransactions(){
          
         tempEnd+= (end - tempEnd<100 && end-tempEnd>0)? (end-tempEnd) : 100;
     }
+}
+
+async function getLastRecordHeight(){
+    const lastTransaction:ITransaction | null = await Transaction.findOne().sort({'confirmation_block':-1});
+
+    if(!lastTransaction){
+        return 0;
+    }else{
+        return lastTransaction.confirmation_block;
+    }
+}
+
+async function addAdditionTransactions(additions:CoinRecord []){
+    if(!additions){
+        throw new HttpException(500, "Additions not found");
+    }
+    for(let addition of additions){
+        await addTransaction(addition);
+    }
+}
+
+async function addTransaction(coinBlock: CoinRecord){
+    const transaction = await serializeTransaction(coinBlock);
+     await transaction.save()
+         .catch(err => {throw new HttpException(500, err.message)});
+}
+
+async function serializeTransaction(coinBlock:CoinRecord): Promise<ITransaction>{
+    const coin = coinBlock.coin;
+    //Retrieving the parent coin info so that we can get the sender
+    let parent_coin : CoinRecord = {} as CoinRecord;
+    await fullNodeService.getCoinRecord(coin.parent_coin_info)
+        .then(data => {
+            if(!data.error){
+                parent_coin = data.coin_record;
+            }
+        });
+
+    //Serializeing the transaction
+    const transaction={
+        new_coin_info: await fullNodeService.getCoinInfo(coin.parent_coin_info.toString(), coin.puzzle_hash.toString(), +coin.amount),
+        created_at: new Date(+coinBlock.timestamp*1000),
+        amount: +coin.amount,
+        confirmation_block: +coinBlock.confirmed_block_index,
+        confirmations_number: await getConfirmationNumber(parent_coin, coinBlock),
+        sender:(parent_coin.coin)? await fullNodeService.convertPuzzleHashToAddress(parent_coin.coin.puzzle_hash): " ",
+        receiver:await fullNodeService.convertPuzzleHashToAddress(coin.puzzle_hash),
+        input: parent_coin.coin
+    }
+    return new Transaction(transaction);
+}
+
+async function getConfirmationNumber(parent_coin:CoinRecord | undefined, coin:CoinRecord){
+   if(!parent_coin?.coin){
+       return 0;
+   }else{
+       return coin.confirmed_block_index - parent_coin.confirmed_block_index;
+   }
 }

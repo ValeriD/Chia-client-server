@@ -1,52 +1,86 @@
 
-import mongoose from "mongoose"
+import { CoinRecord } from "chia-client/dist/src/types/FullNode/CoinRecord";
+import mongoose, { HookNextFunction } from "mongoose"
+import { getCoinInfo } from "../services/full.node.service";
+
 
 export interface ITransaction extends mongoose.Document {
-    coin_info:string;
+
+    new_coin_info:string,
+    created_at:Date,
+    confirmation_block:number,
     amount:number,
-    creation_height:number, 
-    owner_puzzle_hash:string,
-    owner_address:string,
-    creation_time:Date,
-    parent_coin:string,
-    source:string
+    confirmations_number:number,
+
+    input:CoinRecord,
+    outputs:CoinRecord[]
+
+    sender:string,
+    receiver:string,
 }
 
 const transactionSchema = new mongoose.Schema({
-    coin_info:{         
+    new_coin_info: { 
         type:String,
+        required:true,
+        unique:true
+    },
+    confirmation_block:{
+        type: Number,
         required:true
     },
-    amount:{            
+    created_at:{
+        type: Date,
+        required:true
+    },
+    amount:{
         type:Number,
         required:true
     },
-    creation_height:{   
+    confirmations_number:{
         type:Number,
-        required: true
+        required:true
     },
-    owner_puzzle_hash:{  
+    sender:{
         type:String,
         required:true
     },
-    owner_address:{     
+    receiver: {
         type:String,
         required:true
     },
-    parent_coin:{        
-        type:String,
-        required:true
+    input: {
+        type:Object,
     },
-    source:{           
-        type:String,
-        required:true
-    },
-    creation_time:{    
-        type:Date,
-        required:true
-    }
+    outputs: [
+        {
+            type:Object,
+        }
+    ]
 });
 
+
+transactionSchema.post<ITransaction>('save', async function(next:HookNextFunction){
+    const self:any = this;
+    if(self.input){
+        const parent_info = await getCoinInfo(self.input.parent_coin_info, self.input.puzzle_hash, self.input.amount);
+        await Transaction.updateOne(
+            {new_coin_info:parent_info},
+            {$push:
+                {
+                    outputs:{
+                        address:self.receiver,
+                        amount: self.amount
+                    }
+                }
+            })
+    }
+    
+})
+
+
 const Transaction = mongoose.model<ITransaction>('Transaction', transactionSchema);
+
+
 
 export default Transaction;
