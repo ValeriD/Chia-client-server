@@ -56,3 +56,13 @@ export async function addAddress(address:string){
             .catch(err => {throw new HttpException(500, err.message)});
     }
 }
+
+export async function getUniqueAddressCount(){
+    return await Address.countDocuments()
+        .catch(err => {throw new HttpException(500, err.message)});
+}
+
+export async function getCirculatingSupply(){
+    return await Address.aggregate([{$group:{_id:null, circulating_supply:{$sum:"$current_balance"}}}])
+        .catch(err => {throw new HttpException(500, err.message)});
+}

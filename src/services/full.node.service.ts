@@ -1,13 +1,16 @@
-import { FullNode } from "chia-client";
-import { Server } from "../config/config";
 import { FullNodeConnection } from "../connections/full-node.connection";
 import HttpException from "../exceptions/http.exception";
+import { getCirculatingSupply, getUniqueAddressCount } from "./address.service";
 
 const fullNode = FullNodeConnection.getInstance().getFullNode();
 
 export async function getBlockchainState(){
-    return await fullNode.getBlockchainState()
+    const blockchain:any = await fullNode.getBlockchainState()
         .catch(err => {throw new HttpException(500, err.message)});
+    blockchain.blockchain_state.circulating_supply = (await getCirculatingSupply()).values().next().value.circulating_supply;
+    blockchain.blockchain_state.unique_address_count = await getUniqueAddressCount();
+
+    return blockchain;
 }
 
 export async function getBlocks(startHeight: number, endHeight: number){
