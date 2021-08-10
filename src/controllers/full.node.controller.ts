@@ -113,11 +113,11 @@ export async function getAdditionsAndRemovals(req: Request, res:Response, next:N
 
 export async function puzzleHashToAddress(req: Request, res:Response, next:NextFunction){
     
-    if(!req.query.puzzleHash){
+    if(!req.query.puzzle_hash){
         next(new HttpException(400, "No hash provided"));
     }
 
-    const puzzleHash = req.query.puzzleHash?.toString() || "";
+    const puzzleHash = req.query.puzzle_hash?.toString() || "";
 
     await fullNodeService.convertPuzzleHashToAddress(puzzleHash)
         .then(data => {res.send({"address":data})})

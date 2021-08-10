@@ -16,9 +16,8 @@ export async function getTransaction(req: Request, res:Response, next:NextFuncti
     if(!coinInfo || coinInfo === ""){
         next(new HttpException(400, "Coin info not profided"));
     }
-    const creationHeight = +(req.query.creation_height?.toString() || "");
     
-    await transactionService.getTransaction(coinInfo, creationHeight)
+    await transactionService.getTransaction(coinInfo)
         .then(data => res.json(data))
         .catch(err => next(err));
 
