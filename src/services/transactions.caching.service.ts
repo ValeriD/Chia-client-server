@@ -2,7 +2,7 @@ import { CoinRecord } from "chia-client/dist/src/types/FullNode/CoinRecord";
 import Logger from "jet-logger";
 import HttpException from "../exceptions/http.exception";
 import Transaction, { ITransaction } from "../models/transaction.model";
-import fullNode from "../routes/full.node.routes";
+import { addAddress } from "./address.service";
 import * as fullNodeService from "./full.node.service"
 
 /**
@@ -82,6 +82,10 @@ async function serializeTransaction(coinBlock:CoinRecord): Promise<ITransaction>
         receiver:await fullNodeService.convertPuzzleHashToAddress(coin.puzzle_hash),
         input: parent_coin.coin
     }
+
+    //Add address if not added yet
+    await addAddress(transaction.receiver);
+
     return new Transaction(transaction);
 }
 

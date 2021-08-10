@@ -7,7 +7,8 @@ const connectToDatabase = () =>{
         'mongodb://'+ DB.host+"/"+DB.name,{
             useNewUrlParser:true,
             useUnifiedTopology:true,
-            useCreateIndex:true
+            useCreateIndex:true,
+            useFindAndModify:false
         },
         () => {
             Logger.Info("Connected to database");

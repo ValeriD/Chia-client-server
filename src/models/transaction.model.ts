@@ -1,6 +1,7 @@
 
 import { CoinRecord } from "chia-client/dist/src/types/FullNode/CoinRecord";
 import mongoose, { HookNextFunction } from "mongoose"
+import { addTransactionToAddress } from "../services/address.service";
 import { getCoinInfo } from "../services/full.node.service";
 
 
@@ -74,7 +75,9 @@ transactionSchema.post<ITransaction>('save', async function(next:HookNextFunctio
                     }
                 }
             })
+            await addTransactionToAddress(self,true);
     }
+    await addTransactionToAddress(self,false);
     
 })
 
