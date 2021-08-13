@@ -65,17 +65,21 @@ transactionSchema.post<ITransaction>('save', async function(next:HookNextFunctio
     const self:any = this;
     if(self.input){
         const parent_info = await getCoinInfo(self.input.parent_coin_info, self.input.puzzle_hash, self.input.amount);
-        await Transaction.updateOne(
-            {new_coin_info:parent_info},
-            {$push:
-                {
-                    outputs:{
-                        address:self.receiver,
-                        amount: self.amount
-                    }
-                }
-            })
-            await addTransactionToAddress(self,true);
+
+            await Promise.all([
+                Transaction.updateOne(
+                    {new_coin_info:parent_info},
+                    {$push:
+                        {
+                            outputs:{
+                                address:self.receiver,
+                                amount: self.amount
+                            }
+                        }
+                    }),
+
+                addTransactionToAddress(self,true)
+            ])
     }
     await addTransactionToAddress(self,false);
     
