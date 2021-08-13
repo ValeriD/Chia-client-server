@@ -7,4 +7,5 @@ transactionsRouter.get('/get_transactions', transactionController.getTransaction
 
 transactionsRouter.get('/get_transaction_info', transactionController.getTransaction);
 
+transactionsRouter.get('/get_transactions_per_day', transactionController.getTransactionsPerDay);
 export default transactionsRouter;

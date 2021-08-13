@@ -21,3 +21,23 @@ export async function getTransaction(coinInfo: string){
 
     return transaction;
 }
+
+export async function getTransactionsPerDay(){
+    return await Transaction.aggregate([
+        {
+            $group:{
+                _id:{
+                     $dateToString: { format: "%Y-%m-%d", date: "$created_at" } ,
+                },
+                transactions_count:{ $sum:1 }
+
+            }
+        },
+        {
+            $sort:{
+                _id:1
+            }
+        }
+    ])
+    .catch(err => {throw new HttpException(500, err.message)});
+}

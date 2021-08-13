@@ -22,3 +22,9 @@ export async function getTransaction(req: Request, res:Response, next:NextFuncti
         .catch(err => next(err));
 
 }
+
+export async function getTransactionsPerDay(req: Request, res: Response, next: NextFunction){
+    await transactionService.getTransactionsPerDay()
+        .then(data => res.json(data))
+        .catch(err => next(err));
+}
