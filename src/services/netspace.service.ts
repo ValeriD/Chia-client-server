@@ -19,8 +19,22 @@ export async function saveCurrentNetspace(){
         })
 }
 export async function getNetspaceRecords(){
-    return await Netspace.find({}, '-_id -__v')
-        .catch(err => {throw new HttpException(500, err.message)});
+    return await Netspace.aggregate(
+        [
+            {
+                $group:{
+                    _id: {$dateToString: { format: "%Y-%m-%d", date: "$timestamp" }},
+                    max_netspace: {$max:"$current_netspace"}
+                }
+                
+            },
+            {
+                $sort:{
+                    _id:1
+                }
+            }
+        ]
+    ).catch(err => {throw new HttpException(500, err.message)});
 }
 
 
