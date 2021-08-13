@@ -6,7 +6,7 @@ import * as fullNodeService from "../services/full.node.service"
 export async function getBlockchainState(req:Request, res:Response, next:NextFunction)  {
     await fullNodeService.getBlockchainState()
         .then((data) => {res.json(data)})
-        .catch(err => {Logger.Err(err); next()});
+        .catch(err => {next(err)});
 }
 
 export async function getBlock(req: Request, res:Response, next:NextFunction){

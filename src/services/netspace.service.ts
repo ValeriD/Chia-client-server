@@ -1,5 +1,5 @@
 import HttpException from "../exceptions/http.exception";
-import Netspace, { INetspace } from "../models/netspace.model";
+import Netspace from "../models/netspace.model";
 import { getBlockchainState } from "./full.node.service"
 
 
