@@ -7,7 +7,7 @@ const fullNode = FullNodeConnection.getInstance().getFullNode();
 export async function getBlockchainState(){
     const blockchain:any = await fullNode.getBlockchainState()
         .catch(err => {throw new HttpException(500, err.message)});
-    blockchain.blockchain_state.circulating_supply = (await getCirculatingSupply()).values().next().value.circulating_supply;
+    blockchain.blockchain_state.circulating_supply = (await getCirculatingSupply()).values().next().value?.circulating_supply || 0;
     blockchain.blockchain_state.unique_address_count = await getUniqueAddressCount();
 
     return blockchain;
