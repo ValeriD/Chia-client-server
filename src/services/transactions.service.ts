@@ -8,7 +8,7 @@ export async function getTransactions(limit: number, offset: number){
         .sort({confirmation_block:-1})
         .skip(offset)
         .limit(limit)
-        .select('created_at sender receiver amount')
+        .select('new_coin_info created_at sender receiver amount')
         .catch(err => {throw new HttpException(500, err)});
 }
 
