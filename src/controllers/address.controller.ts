@@ -1,7 +1,11 @@
 import { Request, Response ,NextFunction } from "express";
+import HttpException from "../exceptions/http.exception";
 import * as addressService from "../services/address.service"
 
 export async function getAddresses(req: Request, res: Response, next: NextFunction){
+    if(!req.query.offset){
+        next(new HttpException(400, "Offset not provided!"))
+    }
     const offset = +(req.query?.offset || "");
 
     await addressService.getAddresses(offset)
@@ -10,6 +14,9 @@ export async function getAddresses(req: Request, res: Response, next: NextFuncti
 }
 
 export async function getAddress(req: Request, res: Response, next: NextFunction){
+    if(!req.query.address){
+        next(new HttpException(400, "Address not provided!"));
+    }
     const address = req.query?.address?.toString() || "";
 
     await addressService.getAddress(address)
