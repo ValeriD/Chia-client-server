@@ -25,9 +25,9 @@ export async function getBlocks(req: Request, res:Response, next:NextFunction){
     if(!req.query.start_height || !req.query.end_height){
         next(new HttpException(400, "Start height or end height not provided"));
     }
-    const startHeight:number = parseInt(req.query.startHeight?.toString() || "");
+    const startHeight:number = parseInt(req.query.start_height?.toString() || "");
     
-    const endHeight:number = parseInt(req.query.endHeight?.toString() || "");
+    const endHeight:number = parseInt(req.query.end_height?.toString() || "");
 
     await fullNodeService.getBlocks(startHeight, endHeight)
         .then(data => {res.json(data)})
