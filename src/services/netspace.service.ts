@@ -51,9 +51,12 @@ export async function cacheNetspace(){
         for(let block of blocks){
             if(block.reward_chain_block.is_transaction_block && lastTransactionBlock.reward_chain_block.height !== block.reward_chain_block.height){
                 if(await minTimePassedBetween(lastTransactionBlock, block)){
-                    console.log("Here");
-                    const netspace = (await getNetworkSpaceBetweenBlocksByHeight(lastTransactionBlock?.reward_chain_block.height, block.reward_chain_block.height)).space;
-                    lastTransactionBlock = (await getBlockByHeight(block.reward_chain_block.height)).block;
+                    let netspace = 0;
+                    const lastTransactionBlockHeight = block.reward_chain_block.height;
+                    Promise.all([
+                        netspace = (await getNetworkSpaceBetweenBlocksByHeight(lastTransactionBlockHeight, block.reward_chain_block.height)).space,
+                        lastTransactionBlock = (await getBlockByHeight(block.reward_chain_block.height)).block
+                    ])
                     await addNetSpace(new Date(+(block.foliage_transaction_block?.timestamp.toString() || "")*1000), netspace,lastTransactionBlock.reward_chain_block.height);
                 }
             }
@@ -85,10 +88,14 @@ async function addNetSpace(time: Date, netspace: number, height:number){
 }
 
 async function getNetworkSpaceBetweenBlocksByHeight(olderBlockHeight:number, newerBlockHeight:number){
-    const olderBlock  =  (await getBlockRecordByHeight(olderBlockHeight)).block_record.header_hash;
-    const newerBlock  =  (await getBlockRecordByHeight(newerBlockHeight)).block_record.header_hash;
-    
-    return  await getNetworkSpaceBetweenBlocks(olderBlock, newerBlock);
+    let olderBlock = "";
+    let newerBlock = "";
+    await Promise.all([
+        olderBlock = (await getBlockRecordByHeight(olderBlockHeight)).block_record.header_hash,
+        newerBlock = (await getBlockRecordByHeight(newerBlockHeight)).block_record.header_hash
+    ]);
+    return await getNetworkSpaceBetweenBlocks(olderBlock, newerBlock)
+
 }
 async function minTimePassedBetween(olderBlock:Block, newerBlock:Block){
     if(!olderBlock){
