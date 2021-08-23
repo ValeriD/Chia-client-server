@@ -1,11 +1,11 @@
 import { CronJob } from "cron";
 import Logger from "jet-logger";
-import { saveCurrentNetspace } from "./services/netspace.service";
+import { cacheNetspace, saveCurrentNetspace } from "./services/netspace.service";
 import { checkForNewTransactions } from "./services/transactions.caching.service";
 
 
 const startTransactionsCachingJob = () => {
-    new CronJob('1 * * * * *', async () => {
+    new CronJob('0 * * * * *', async () => {
         Logger.Info("Transaction caching job started");
         await checkForNewTransactions()
             .catch(err => Logger.Err(err.message));
@@ -14,10 +14,10 @@ const startTransactionsCachingJob = () => {
 }
 
 const startNetspaceJob = () => {
-    new CronJob('41 * * * *', async () => {
+    new CronJob('20 * * * *', async () => {
         Logger.Info("Netspace job started");
 
-        await saveCurrentNetspace()
+        await cacheNetspace()
             .catch(err => Logger.Err(err.message));
 
         Logger.Info("Netspace job finished");

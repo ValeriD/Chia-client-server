@@ -24,6 +24,14 @@ export async function getBlockByHash(hash:string){
         .catch(err => {throw new HttpException(500, err.message)});
 }
 
+export async function getBlockByHeight(height:number){
+    const hash =  (await fullNode.getBlockRecordByHeight(height)
+        .catch(err => {throw new HttpException(500, err.message)})).block_record.header_hash;
+
+    return await getBlockByHash(hash)
+        .catch(err => {throw new HttpException(500, err.message)});
+}
+
 export async function getBlockRecordByHeight(height:number){
     return await fullNode.getBlockRecordByHeight(height)
         .catch(err => {throw new HttpException(500, err.message)});
@@ -86,4 +94,5 @@ export async function getNetworkSpaceBetweenBlocks(oldBlockHash:string, newBlock
     return await fullNode.getNetworkSpace(newBlockHash, oldBlockHash)
         .catch(err => {throw new HttpException(500, err.message)});
 }
+
 

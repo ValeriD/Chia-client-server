@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 export interface INetspace extends mongoose.Document{
     timestamp: Date,
-    current_netspace: number
+    current_netspace: number,
+    height:number
 }
 
 const netspaceSchema = new mongoose.Schema({
@@ -12,6 +13,10 @@ const netspaceSchema = new mongoose.Schema({
     },
     current_netspace: {
         type: Number,
+        required:true
+    },
+    height:{
+        type:Number,
         required:true
     }
 });
