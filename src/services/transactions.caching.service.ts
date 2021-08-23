@@ -11,7 +11,7 @@ import * as fullNodeService from "./full.node.service"
  */
 export async function checkForNewTransactions(){
     const end = (await fullNodeService.getBlockchainState()).blockchain_state.peak.height +1;
-    let start = await getLastRecordHeight();
+    let start = await getLastRecordHeight()+1;
 
     let tempEnd = (end-start<100)? end : start+100;
 

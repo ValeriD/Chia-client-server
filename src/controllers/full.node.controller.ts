@@ -22,7 +22,7 @@ export async function getBlock(req: Request, res:Response, next:NextFunction){
 }
 
 export async function getBlocks(req: Request, res:Response, next:NextFunction){
-    if(!req.query.startHeight || !req.query.endHeight){
+    if(!req.query.start_height || !req.query.end_height){
         next(new HttpException(400, "Start height or end height not provided"));
     }
     const startHeight:number = parseInt(req.query.startHeight?.toString() || "");
