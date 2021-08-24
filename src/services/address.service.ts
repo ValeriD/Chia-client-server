@@ -2,12 +2,12 @@ import HttpException from "../exceptions/http.exception";
 import Address, { TransactionType } from "../models/address.model";
 import { ITransaction } from "../models/transaction.model";
 
-export async function getAddresses(offset: number){
+export async function getAddresses(limit:number, offset: number){
     return await Address.find({}, "-_id")
         .sort({current_balance:-1})
         .select("address current_balance")
         .skip(offset)
-        .limit(25)
+        .limit(limit)
         .catch(err => {throw new HttpException(500, err.message)});
 }
 

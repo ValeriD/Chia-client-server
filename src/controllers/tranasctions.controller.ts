@@ -3,7 +3,7 @@ import HttpException from "../exceptions/http.exception";
 import * as transactionService from "../services/transactions.service"
 
 export async function getTransactions(req: Request, res: Response, next: NextFunction){
-    if(!req.query.limit || req.query.offset){
+    if(!req.query.limit || !req.query.offset){
         next(new HttpException(400, "Offset or limit not provided!"));
     }
     const limit = +(req.query.limit?.toString() || "");

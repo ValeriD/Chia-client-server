@@ -6,9 +6,11 @@ export async function getAddresses(req: Request, res: Response, next: NextFuncti
     if(!req.query.offset){
         next(new HttpException(400, "Offset not provided!"))
     }
-    const offset = +(req.query?.offset || "");
 
-    await addressService.getAddresses(offset)
+    const offset = +(req.query?.offset || "");
+    const limit = +(req.query.limit?.toString() || "") || 25;
+
+    await addressService.getAddresses(limit, offset)
         .then(data => res.json(data))
         .catch(err => next(err));
 }
