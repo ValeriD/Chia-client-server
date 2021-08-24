@@ -1,6 +1,6 @@
 import { CronJob } from "cron";
 import Logger from "jet-logger";
-import { cacheNetspace, saveCurrentNetspace } from "./services/netspace.service";
+import { cacheNetspace } from "./services/netspace.service";
 import { checkForNewTransactions } from "./services/transactions.caching.service";
 
 

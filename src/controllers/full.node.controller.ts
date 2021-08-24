@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import Logger from "jet-logger";
 import HttpException from "../exceptions/http.exception";
 import * as fullNodeService from "../services/full.node.service"
 
