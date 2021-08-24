@@ -66,10 +66,11 @@ async function serializeTransaction(coinBlock:CoinRecord): Promise<ITransaction>
     let parent_coin : CoinRecord = {} as CoinRecord;
     await fullNodeService.getCoinRecord(coin.parent_coin_info)
         .then(data => {
-            if(!data.error){
+            if(data.success){
                 parent_coin = data.coin_record;
             }
-        });
+        })
+        .catch(err => {});
 
     //Serializeing the transaction
     const transaction={

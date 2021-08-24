@@ -7,6 +7,10 @@ const fullNode = FullNodeConnection.getInstance().getFullNode();
 export async function getBlockchainState(){
     const blockchain:any = await fullNode.getBlockchainState()
         .catch(err => {throw new HttpException(500, err.message)});
+
+    if(!blockchain.success){
+        throw new HttpException(500, blockchain.error || "");
+    }
     blockchain.blockchain_state.circulating_supply = (await getCirculatingSupply()).values().next().value?.circulating_supply || 0;
     blockchain.blockchain_state.unique_address_count = await getUniqueAddressCount();
 
@@ -14,54 +18,98 @@ export async function getBlockchainState(){
 }
 
 export async function getBlocks(startHeight: number, endHeight: number){
-    return await fullNode.getBlocks(startHeight, endHeight)
+    const blocks = await fullNode.getBlocks(startHeight, endHeight)
         .catch(err => {throw new HttpException(500, err.message)});
 
+
+    if(!blocks.success){
+        throw new HttpException(404, blocks.error || "");
+    }
+    return blocks;
 }
 
 export async function getBlockByHash(hash:string){
-    return await fullNode.getBlock(hash)
+
+    const block = await fullNode.getBlock(hash)
         .catch(err => {throw new HttpException(500, err.message)});
+    if(!block.success){
+        throw new HttpException(404, block.error || "");
+    }
+    return block
 }
 
 export async function getBlockByHeight(height:number){
-    const hash =  (await fullNode.getBlockRecordByHeight(height)
-        .catch(err => {throw new HttpException(500, err.message)})).block_record.header_hash;
-
-    return await getBlockByHash(hash)
+    const res = await fullNode.getBlockRecordByHeight(height)
         .catch(err => {throw new HttpException(500, err.message)});
+
+    if(!res.success){
+        throw new HttpException(404, res.error || "");
+    }
+
+    const hash = res.block_record.header_hash;
+    
+    const record = await getBlockByHash(hash);
+
+    if(!record.success){
+        throw new HttpException(500, record.error || "");
+    }
+    return record;
 }
 
 export async function getBlockRecordByHeight(height:number){
-    return await fullNode.getBlockRecordByHeight(height)
+    const blockRecord = await fullNode.getBlockRecordByHeight(height)
         .catch(err => {throw new HttpException(500, err.message)});
+
+    if(!blockRecord.success){
+        throw new HttpException(404, blockRecord.error || "");
+    }
+    return blockRecord;
 }
 
 export async function getBlockRecordByHash(hash:string){
-    return await fullNode.getBlockRecord(hash)
+    const blockRecord = await fullNode.getBlockRecord(hash)
         .catch(err => {throw new HttpException(500, err.message)});
+    if(!blockRecord.success){
+        throw new HttpException(404, blockRecord.error || "");
+    }
+    return blockRecord;
 }
 
 export async function getUnfinishedBlockHeaders(height: number){
-    return await fullNode.getUnfinishedBlockHeaders(height)
+    const unfinishedBlocks = await fullNode.getUnfinishedBlockHeaders(height)
         .catch(err => {throw new HttpException(500, err.message)});
+    
+    if(!unfinishedBlocks.success){
+        throw new HttpException(404, unfinishedBlocks.error || "");
+    }
+    return unfinishedBlocks;
 }
 
 export async function getUnspentCoins(puzzleHash:string){
-    return await fullNode.getUnspentCoins(puzzleHash)
+    const unspentCoins = await fullNode.getUnspentCoins(puzzleHash)
         .catch(err => {throw new HttpException(500, err.message)});
+    if(!unspentCoins.success){
+        throw new HttpException(404, unspentCoins.error || "");
+    }
+    return unspentCoins;
 }
 
 export async function getCoinRecord(coin_info: string){
-    return await fullNode.getCoinRecordByName(coin_info)
+    const coinRecord = await fullNode.getCoinRecordByName(coin_info)
         .catch(err => {throw new HttpException(500, err.message)});
-
+    if(!coinRecord.success){
+        throw new HttpException(404, coinRecord.error || "");
+    }
+    return coinRecord;
 }
 
 export async function getAdditionsAndRemovals(hash: string){
-    return await fullNode.getAdditionsAndRemovals(hash)
+    const additionsAndRemovals = await fullNode.getAdditionsAndRemovals(hash)
         .catch(err => {throw new HttpException(500, err.message)});
-
+    if(! additionsAndRemovals.success){
+        throw new HttpException(404, additionsAndRemovals.error || "");
+    }
+    return additionsAndRemovals;
 }
 
 export async function convertPuzzleHashToAddress(hash: string) {
@@ -91,8 +139,12 @@ export async function getBlocksInRange(start:number, end:number){
 }
 
 export async function getNetworkSpaceBetweenBlocks(oldBlockHash:string, newBlockHash:string){
-    return await fullNode.getNetworkSpace(newBlockHash, oldBlockHash)
+    const netspace = await fullNode.getNetworkSpace(newBlockHash, oldBlockHash)
         .catch(err => {throw new HttpException(500, err.message)});
+    if(!netspace.success){
+        throw new HttpException(400, netspace.success || "");
+    }
+    return netspace;
 }
 
 
