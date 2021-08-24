@@ -7,7 +7,7 @@ import { getCoinInfo } from "../services/full.node.service";
 
 export interface ITransaction extends mongoose.Document {
 
-    new_coin_info:string,
+    transaction_id:string,
     created_at:Date,
     confirmation_block:number,
     amount:number,
@@ -21,7 +21,7 @@ export interface ITransaction extends mongoose.Document {
 }
 
 const transactionSchema = new mongoose.Schema({
-    new_coin_info: { 
+    transaction_id: { 
         type:String,
         required:true,
         unique:true
@@ -68,7 +68,7 @@ transactionSchema.post<ITransaction>('save', async function(next:HookNextFunctio
 
             await Promise.all([
                 Transaction.updateOne(
-                    {new_coin_info:parent_info},
+                    {transaction_id:parent_info},
                     {$push:
                         {
                             outputs:{

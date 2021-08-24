@@ -15,12 +15,12 @@ export async function getTransactions(req: Request, res: Response, next: NextFun
 }
 
 export async function getTransaction(req: Request, res:Response, next:NextFunction){
-    const coinInfo = req.query.coin_info?.toString() || "";
-    if(!coinInfo || coinInfo === ""){
+    const transactionId = req.query.transaction_id?.toString() || "";
+    if(!transactionId || transactionId === ""){
         next(new HttpException(400, "Coin info not provided"));
     }
     
-    await transactionService.getTransaction(coinInfo)
+    await transactionService.getTransaction(transactionId)
         .then(data => res.json(data))
         .catch(err => next(err));
 

@@ -74,7 +74,7 @@ async function serializeTransaction(coinBlock:CoinRecord): Promise<ITransaction>
 
     //Serializeing the transaction
     const transaction={
-        new_coin_info: await fullNodeService.getCoinInfo(coin.parent_coin_info.toString(), coin.puzzle_hash.toString(), +coin.amount),
+        transaction_id: await fullNodeService.getCoinInfo(coin.parent_coin_info.toString(), coin.puzzle_hash.toString(), +coin.amount),
         created_at: new Date(+coinBlock.timestamp*1000),
         amount: +coin.amount,
         confirmation_block: +coinBlock.confirmed_block_index,

@@ -8,12 +8,12 @@ export async function getTransactions(limit: number, offset: number){
         .sort({confirmation_block:-1})
         .skip(offset)
         .limit(limit)
-        .select('new_coin_info created_at sender receiver amount')
+        .select('transaction_id created_at sender receiver amount')
         .catch(err => {throw new HttpException(500, err)});
 }
 
-export async function getTransaction(coinInfo: string){
-    const transaction = await Transaction.findOne({new_coin_info: coinInfo}, '-_id -__v')
+export async function getTransaction(transactionId: string){
+    const transaction = await Transaction.findOne({transaction_id: transactionId}, '-_id -__v')
         .catch(err => {throw new HttpException(500, err.message)});
     if(!transaction){
         throw new HttpException(404, "Transaction does not exist!");
