@@ -1,6 +1,7 @@
 import { FullNodeConnection } from "../connections/full-node.connection";
 import HttpException from "../exceptions/http.exception";
-import { getCirculatingSupply, getUniqueAddressCount } from "./address.service";
+import { getAddress, getCirculatingSupply, getUniqueAddressCount } from "./address.service";
+import { getTransaction } from "./transactions.service";
 
 const fullNode = FullNodeConnection.getInstance().getFullNode();
 
@@ -147,4 +148,25 @@ export async function getNetworkSpaceBetweenBlocks(oldBlockHash:string, newBlock
     return netspace;
 }
 
+export async function find(searchId: any){
+    
+    if(searchId.toString().substring(0,3)==="cgn"){
+        return {address:await getAddress(searchId.toString())};
+    }else if(searchId.toString().substring(0,2)==="0x"){
+        let searchBlock = false;
+        const transaction = await getTransaction(searchId.toString())
+            .catch(err => {
+                if(err.status === 404){
+                    searchBlock = true;
+                }
+            });
+        if(!searchBlock){
+            return { transaction:transaction};
+        }else{
+            return await getBlockByHash(searchId.toString());
+        }
+    }else{
+        return await getBlockByHeight(+(searchId.toString() || ""));
+    }
+}
 

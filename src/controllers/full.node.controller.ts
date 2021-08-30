@@ -151,3 +151,15 @@ export async function getCoinInfo(req: Request, res:Response, next:NextFunction)
             next(err)
         });
 }
+
+export async function search(req: Request, res:Response,next: NextFunction){
+    
+    const searchId = req.query.search_text?.toString() || "";
+
+    if(!searchId){
+        next(new HttpException(400, "Parameter not provided!"));
+    }
+    await fullNodeService.find(searchId)
+        .then(data => {res.json(data)})
+        .catch(err => {next(err)});
+}

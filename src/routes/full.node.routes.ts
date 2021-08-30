@@ -27,6 +27,8 @@ fullNode.get('/puzzleHash_to_address', fullNodeController.puzzleHashToAddress);
 
 fullNode.get('/address_to_puzzleHash', fullNodeController.addressToPuzzleHash);
 
-fullNode.get('/get_nespace_per_day',netspaceRecords)
+fullNode.get('/get_nespace_per_day',netspaceRecords);
+
+fullNode.get('/search', fullNodeController.search);
 
 export default fullNode;
