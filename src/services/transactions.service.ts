@@ -1,8 +1,6 @@
 import HttpException from "../exceptions/http.exception";
 import Transaction from "../models/transaction.model"
 
-export async function getAllTransactions(){
-}
 export async function getTransactions(limit: number, offset: number){
     return await Transaction.find({},'-_id')
         .sort({confirmation_block:-1})
@@ -20,6 +18,11 @@ export async function getTransaction(transactionId: string){
     }
 
     return transaction;
+}
+
+export async function getTransactionsByCreationHeight(height:number){
+    return await Transaction.find({confirmation_block:height}, '-_id -__v')
+        .catch(err => {throw new HttpException(500, err.message)});   
 }
 
 export async function getTransactionsPerDay(){

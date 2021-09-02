@@ -1,7 +1,7 @@
 import { FullNodeConnection } from "../connections/full-node.connection";
 import HttpException from "../exceptions/http.exception";
 import { getAddress, getCirculatingSupply, getUniqueAddressCount } from "./address.service";
-import { getTransaction } from "./transactions.service";
+import { getTransaction, getTransactionsByCreationHeight } from "./transactions.service";
 
 const fullNode = FullNodeConnection.getInstance().getFullNode();
 
@@ -35,6 +35,11 @@ export async function getBlockByHash(hash:string){
         .catch(err => {throw new HttpException(500, err.message)});
     if(!block.success){
         throw new HttpException(404, block.error || "");
+    }
+
+    if(block.block.reward_chain_block.is_transaction_block){
+        (block.block.reward_chain_block as any).amount = await calculateTransactionBlockAmount(hash);
+        (block.block.transactions_info as any).transactions = await getTransactionsByCreationHeight(+block.block.reward_chain_block.height);
     }
     return block
 }
@@ -168,5 +173,19 @@ export async function find(searchId: any){
     }else{
         return await getBlockByHeight(+(searchId.toString() || ""));
     }
+}
+
+async function calculateTransactionBlockAmount(hash:string){
+    const additionsAndRemovals = await getAdditionsAndRemovals(hash);
+    let amount = 0;
+    for(const addition of additionsAndRemovals.additions){
+        amount += +(addition.coin.amount);
+    }
+
+    for(const removal of additionsAndRemovals.removals){
+        amount-= +(removal.coin.amount);
+    }
+
+    return amount;    
 }
 
