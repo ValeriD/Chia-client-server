@@ -38,7 +38,7 @@ export async function getBlockByHash(hash:string){
     }
 
     if(block.block.reward_chain_block.is_transaction_block){
-        (block.block.reward_chain_block as any).amount = await calculateTransactionBlockAmount(hash);
+        (block.block.transactions_info as any).amount = await calculateTransactionBlockAmount(hash);
         (block.block.transactions_info as any).transactions = await getTransactionsByCreationHeight(+block.block.reward_chain_block.height);
     }
     return block
