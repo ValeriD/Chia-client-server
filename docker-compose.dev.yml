@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  chaingreen-explorer-server:
+    container_name: chaingreen-explorer-server
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    depends_on: 
+      - chaingreen
+  

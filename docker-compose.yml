@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  chaingreen-explorer-server:
+    container_name: chaingreen-explorer-server
+    volumes: 
+      - conf:/root/.chaingreen/
+      - cert:/etc/ca-certificates/
+    environment:
+      - HOST=chaingreen-explorer-server
+      - PORT=3000
+      - FULLNODE_PORT=8744
+      - FULLNODE_HOST=chaingreen
+      - FULLNODE_CERTPATH=/etc/ca-certificates/chaingreen_ca.crt
+      - FULLNODE_KEYPATH=/etc/ca-certificates/chaingreen_ca.key
+    networks:
+      - chaingreen-net
+  chaingreen:
+    image: chaingreen/chaingreen
+    volumes: 
+      - conf:/root/.chaingreen/
+      - cert:/chaingreen-blockchain/chaingreen/ssl/
+    networks:
+      - chaingreen-net
+networks:
+  chaingreen-net:
+    driver: bridge
+volumes:
+  conf:
+  cert:
