@@ -20,6 +20,8 @@ export async function getAddress(address:string){
         throw new HttpException(404, "Address not found");
     }
 
+    res.transactions.sort(function(a,b){return b.transaction.created_at - a.transaction.created_at});
+
     return res;    
 }
 
