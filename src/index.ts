@@ -4,10 +4,10 @@ import app from "./server"
 import { connectToDatabase } from "./db_connection"
 import { startCronJobs } from "./cron-jobs";
 
-connectToDatabase();
+//connectToDatabase();
 
-startCronJobs();
+//startCronJobs();
 
 app.listen(Server.port, ()=>{
-    Logger.Info(`Server started on port: ` + Server.port)
+    Logger.Info(`Server started on ${Server.host}:${Server.port}`);
 })
