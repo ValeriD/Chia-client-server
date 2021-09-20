@@ -9,7 +9,7 @@ export class FullNodeConnection{
 
     private constructor(){
         this.fullNode = new FullNode({
-            protocol: 'http',
+            protocol: 'https',
             hostname: FULLNODE.host,
             port: FULLNODE.port,
             certPath:FULLNODE.certPath,

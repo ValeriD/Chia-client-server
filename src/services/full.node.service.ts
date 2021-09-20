@@ -1,12 +1,27 @@
+import { FullNode } from "chia-client";
 import { FullNodeConnection } from "../connections/full-node.connection";
 import HttpException from "../exceptions/http.exception";
 import { getAddress, getCirculatingSupply, getUniqueAddressCount } from "./address.service";
 import { getTransaction, getTransactionsByCreationHeight } from "./transactions.service";
 
-const fullNode = FullNodeConnection.getInstance().getFullNode();
+export async function initFullNodeConnection(){
+    let fullNodeConnection = FullNodeConnection.getInstance() as any;
+    if(fullNodeConnection.fullNode.agent.options.rejectUnauthorized){
+        console.log("Unauthorized")
+        await delay(5000);
+        await initFullNodeConnection();    
+    }   
+}
+
+const fullNode = () => {return FullNodeConnection.getInstance().getFullNode()};
+
+async function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 
 export async function getBlockchainState(){
-    const blockchain:any = await fullNode.getBlockchainState()
+    const blockchain:any = await fullNode().getBlockchainState()
         .catch(err => {throw new HttpException(500, err.message+" here")});
 
     if(!blockchain.success){
@@ -19,7 +34,7 @@ export async function getBlockchainState(){
 }
 
 export async function getBlocks(startHeight: number, endHeight: number){
-    const blocks = await fullNode.getBlocks(startHeight, endHeight)
+    const blocks = await fullNode().getBlocks(startHeight, endHeight)
         .catch(err => {throw new HttpException(500, err.message)});
 
 
@@ -31,7 +46,7 @@ export async function getBlocks(startHeight: number, endHeight: number){
 
 export async function getBlockByHash(hash:string){
 
-    const block = await fullNode.getBlock(hash)
+    const block = await fullNode().getBlock(hash)
         .catch(err => {throw new HttpException(500, err.message)});
     if(!block.success){
         throw new HttpException(404, block.error || "");
@@ -45,7 +60,7 @@ export async function getBlockByHash(hash:string){
 }
 
 export async function getBlockByHeight(height:number){
-    const res = await fullNode.getBlockRecordByHeight(height)
+    const res = await fullNode().getBlockRecordByHeight(height)
         .catch(err => {throw new HttpException(500, err.message)});
 
     if(!res.success){
@@ -63,7 +78,7 @@ export async function getBlockByHeight(height:number){
 }
 
 export async function getBlockRecordByHeight(height:number){
-    const blockRecord = await fullNode.getBlockRecordByHeight(height)
+    const blockRecord = await fullNode().getBlockRecordByHeight(height)
         .catch(err => {throw new HttpException(500, err.message)});
 
     if(!blockRecord.success){
@@ -73,7 +88,7 @@ export async function getBlockRecordByHeight(height:number){
 }
 
 export async function getBlockRecordByHash(hash:string){
-    const blockRecord = await fullNode.getBlockRecord(hash)
+    const blockRecord = await fullNode().getBlockRecord(hash)
         .catch(err => {throw new HttpException(500, err.message)});
     if(!blockRecord.success){
         throw new HttpException(404, blockRecord.error || "");
@@ -82,7 +97,7 @@ export async function getBlockRecordByHash(hash:string){
 }
 
 export async function getUnfinishedBlockHeaders(height: number){
-    const unfinishedBlocks = await fullNode.getUnfinishedBlockHeaders(height)
+    const unfinishedBlocks = await fullNode().getUnfinishedBlockHeaders(height)
         .catch(err => {throw new HttpException(500, err.message)});
     
     if(!unfinishedBlocks.success){
@@ -92,7 +107,7 @@ export async function getUnfinishedBlockHeaders(height: number){
 }
 
 export async function getUnspentCoins(puzzleHash:string){
-    const unspentCoins = await fullNode.getUnspentCoins(puzzleHash)
+    const unspentCoins = await fullNode().getUnspentCoins(puzzleHash)
         .catch(err => {throw new HttpException(500, err.message)});
     if(!unspentCoins.success){
         throw new HttpException(404, unspentCoins.error || "");
@@ -101,7 +116,7 @@ export async function getUnspentCoins(puzzleHash:string){
 }
 
 export async function getCoinRecord(coin_info: string){
-    const coinRecord = await fullNode.getCoinRecordByName(coin_info)
+    const coinRecord = await fullNode().getCoinRecordByName(coin_info)
         .catch(err => {throw new HttpException(500, err.message)});
     if(!coinRecord.success){
         throw new HttpException(404, coinRecord.error || "");
@@ -110,7 +125,7 @@ export async function getCoinRecord(coin_info: string){
 }
 
 export async function getAdditionsAndRemovals(hash: string){
-    const additionsAndRemovals = await fullNode.getAdditionsAndRemovals(hash)
+    const additionsAndRemovals = await fullNode().getAdditionsAndRemovals(hash)
         .catch(err => {throw new HttpException(500, err.message)});
     if(! additionsAndRemovals.success){
         throw new HttpException(404, additionsAndRemovals.error || "");
@@ -120,11 +135,11 @@ export async function getAdditionsAndRemovals(hash: string){
 
 export async function convertPuzzleHashToAddress(hash: string) {
     
-    return await fullNode.puzzleHashToAddress(hash);
+    return await fullNode().puzzleHashToAddress(hash);
 }
 
 export async function convertAddressToPuzzleHash(address: string) {
-    const hash = fullNode.addressToPuzzleHash(address)
+    const hash = fullNode().addressToPuzzleHash(address)
     if(hash.length===0){
        throw new HttpException(500, "Empty hash")
     }
@@ -132,7 +147,7 @@ export async function convertAddressToPuzzleHash(address: string) {
 }
 export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, amount: number) {
 
-    const res =  fullNode.getCoinInfo(parentCoinInfo, puzzleHash, amount)
+    const res =  fullNode().getCoinInfo(parentCoinInfo, puzzleHash, amount)
     if(!res || res === ''){
         throw new HttpException(500, "Connection refused");
     }
@@ -140,12 +155,12 @@ export async function getCoinInfo(parentCoinInfo: string, puzzleHash: string, am
 }
 
 export async function getBlocksInRange(start:number, end:number){
-    return await fullNode.getBlocks(start, end)
+    return await fullNode().getBlocks(start, end)
         .catch(err => {throw new HttpException(500, err.message)});
 }
 
 export async function getNetworkSpaceBetweenBlocks(oldBlockHash:string, newBlockHash:string){
-    const netspace = await fullNode.getNetworkSpace(newBlockHash, oldBlockHash)
+    const netspace = await fullNode().getNetworkSpace(newBlockHash, oldBlockHash)
         .catch(err => {throw new HttpException(500, err.message)});
     if(!netspace.success){
         throw new HttpException(400, netspace.success || "");
@@ -154,18 +169,18 @@ export async function getNetworkSpaceBetweenBlocks(oldBlockHash:string, newBlock
 }
 
 export async function find(searchId: any){
-    
+    //Check if the provided search ID is address
     if(searchId.toString().substring(0,3)==="cgn"){
         return {address:await getAddress(searchId.toString())};
-    }else if(searchId.toString().substring(0,2)==="0x"){
-        let searchBlock = false;
+    }else if(searchId.toString().substring(0,2)==="0x"){ // FIXME create a better search
+        let searchedIsBlock = false;
         const transaction = await getTransaction(searchId.toString())
             .catch(err => {
                 if(err.status === 404){
-                    searchBlock = true;
+                    searchedIsBlock = true;
                 }
             });
-        if(!searchBlock){
+        if(!searchedIsBlock){ //If 
             return { transaction:transaction};
         }else{
             return await getBlockByHash(searchId.toString());

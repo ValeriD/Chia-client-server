@@ -3,13 +3,17 @@ import Logger from "jet-logger";
 import { cacheNetspace } from "./services/netspace.service";
 import { checkForNewTransactions } from "./services/transactions.caching.service";
 
-
+let isTransactionsJobRunning = false;
 const startTransactionsCachingJob = () => {
     new CronJob('0 * * * * *', async () => {
-        Logger.Info("Transaction caching job started");
-        await checkForNewTransactions()
-            .catch(err => Logger.Err(err.message));
-        Logger.Info("Transaction caching job finished");
+        if(!isTransactionsJobRunning){
+            isTransactionsJobRunning = true;
+            Logger.Info("Transaction caching job started");
+            await checkForNewTransactions()
+                .catch(err => Logger.Err(err.message));
+            Logger.Info("Transaction caching job finished");
+            isTransactionsJobRunning = false;
+        }
     }).start();
 }
 
