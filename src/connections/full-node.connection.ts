@@ -1,6 +1,6 @@
 import { FullNode } from "chia-client";
 import Logger from "jet-logger";
-import { Server } from "../config/config";
+import { FULLNODE } from "../config/config";
 
 
 export class FullNodeConnection{
@@ -10,8 +10,10 @@ export class FullNodeConnection{
     private constructor(){
         this.fullNode = new FullNode({
             protocol: 'https',
-            hostname: Server.host,
-            port: 8855
+            hostname: FULLNODE.host,
+            port: FULLNODE.port,
+            certPath:FULLNODE.certPath,
+            keyPath:FULLNODE.keyPath
         });
     }
 
