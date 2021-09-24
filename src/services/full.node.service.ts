@@ -1,4 +1,4 @@
-import { FullNode } from "chia-client";
+import Logger from "jet-logger";
 import { FullNodeConnection } from "../connections/full-node.connection";
 import HttpException from "../exceptions/http.exception";
 import { getAddress, getCirculatingSupply, getUniqueAddressCount } from "./address.service";
@@ -7,7 +7,7 @@ import { getTransaction, getTransactionsByCreationHeight } from "./transactions.
 export async function initFullNodeConnection(){
     let fullNodeConnection = FullNodeConnection.getInstance() as any;
     if(fullNodeConnection.fullNode.agent.options.rejectUnauthorized){
-        console.log("Unauthorized")
+        Logger.Err("Unable to connect to Full node!");
         await delay(5000);
         await initFullNodeConnection();    
     }   
@@ -27,8 +27,8 @@ export async function getBlockchainState(){
     if(!blockchain.success){
         throw new HttpException(500, blockchain.error || "");
     }
-    // blockchain.blockchain_state.circulating_supply = (await getCirculatingSupply()).values().next().value?.circulating_supply || 0;
-    // blockchain.blockchain_state.unique_address_count = await getUniqueAddressCount();
+    blockchain.blockchain_state.circulating_supply = (await getCirculatingSupply()).values().next().value?.circulating_supply || 0;
+    blockchain.blockchain_state.unique_address_count = await getUniqueAddressCount();
 
     return blockchain;
 }
