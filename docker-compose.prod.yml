@@ -3,4 +3,5 @@ services:
   chaingreen-explorer-server:
     build: 
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
+    
