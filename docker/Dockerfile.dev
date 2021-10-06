@@ -1,12 +1,12 @@
 FROM node:14.17.1
 
-WORKDIR /app
+WORKDIR /home/app
 
-COPY package.json ./
+COPY package.json /home/app
 
-COPY tsconfig.json ./
+COPY tsconfig.json /home/app
 
-COPY src ./src
+COPY src /home/app/src
 
 RUN npm install
 

@@ -2,5 +2,5 @@ version: "3.7"
 services:
   chaingreen-explorer-server:
     build: 
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ..
+      dockerfile: docker/Dockerfile.dev
