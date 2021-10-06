@@ -24,27 +24,8 @@ services:
       
       ## Database parameters ##
 
-      - DB_USER=valerid # Database user's username
-      
-      - DB_PASS=mypassword # Database user's password
-
       - DB_NAME=chaingreen # Database's name
       
       - DB_HOST=localhost # Database's host IP
       
       - DB_PORT=27017 # Database's port
- 
-    depends_on: ## Containers that must be loaded before the server
-      - mongo
-  
-  mongo:
-    image: mongo:latest # Loading the latest mongo 
-    network_mode: "host"
-    volumes:
-      - mongo-db:/data/db # Named volume for saving the data of the database
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=valerid # Username for the root user
-      - MONGO_INITDB_ROOT_PASSWORD=mypassword # Password for the root user
-   
-volumes: ## Declaring the named volumes
-  mongo-db:
