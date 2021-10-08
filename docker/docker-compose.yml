@@ -1,16 +1,16 @@
 version: "3.7"
 services:
   chaingreen-explorer-server:
-    volumes:
-      - /home/valeri/.chaingreen/:/root/.chaingreen
     network_mode: "host"
+    volumes:
+      - certificates:/root/.chaingreen
     environment:
 
       ## Server's params ##
      
       - HOST=chaingreen-explorer-server  #Server's IP
       
-      - PORT=3000 #Server's port
+      - PORT=4000 #Server's port
       
       ## FullNode parameters ##
       
@@ -29,3 +29,14 @@ services:
       - DB_HOST=localhost # Database's host IP
       
       - DB_PORT=27017 # Database's port
+    depends_on:
+      - chaingreen
+  chaingreen:
+    image: chaingreen/chaingreen
+    ports:
+      - "8655:8655"
+    volumes:
+      - /home/valeri/.chaingreen/:/root/.chaingreen/
+
+volumes:
+  certificates:
