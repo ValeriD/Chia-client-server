@@ -24,7 +24,25 @@ export async function getAddress(address:string){
 
     return res;    
 }
-
+export async function removeTransactionFromAddress(transaction:ITransaction, isSend: boolean){
+    await Address.findOneAndUpdate(
+        {address: (isSend)? transaction.sender : transaction.receiver},
+        {
+            $inc:{
+                total_sent: (isSend)? -1*transaction.amount : 0,
+                total_received: (!isSend)? -1*transaction.amount : 0,
+                current_balance: (isSend)? transaction.amount : transaction.amount,
+                number_of_transactions: 1
+            },
+            $pull:{
+                transactions:{
+                    transaction: transaction._id,
+                    transaction_type:(isSend)? TransactionType.send: TransactionType.receive
+                }
+            }
+        }
+    )
+}
 export async function addTransactionToAddress(transaction: ITransaction, isSend:boolean){
     await Address.findOneAndUpdate(
         {address:(isSend)?transaction.sender: transaction.receiver},
