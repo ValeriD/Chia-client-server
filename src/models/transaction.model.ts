@@ -1,8 +1,9 @@
 
 import { CoinRecord } from "chia-client/dist/src/types/FullNode/CoinRecord";
 import mongoose, { HookNextFunction } from "mongoose"
-import { addTransactionToAddress } from "../services/address.service";
+import { addTransactionToAddress, removeTransactionFromAddress } from "../services/address.service";
 import { getCoinInfo } from "../services/full.node.service";
+import Address from "./address.model";
 
 
 export interface ITransaction extends mongoose.Document {
@@ -83,6 +84,13 @@ transactionSchema.post<ITransaction>('save', async function(next:HookNextFunctio
     }
     await addTransactionToAddress(self,false);
     
+})
+""
+transactionSchema.pre<ITransaction>('remove', async function(next:HookNextFunction){
+    if(this.sender !== " "){
+        await removeTransactionFromAddress(this, true);
+    }
+    await removeTransactionFromAddress(this,false);
 })
 
 

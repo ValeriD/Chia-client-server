@@ -10,6 +10,7 @@ import * as fullNodeService from "./full.node.service"
  * Then is called the addNewTransaction with the block hash that gets all additions and saves them in the database
  */
 export async function checkForNewTransactions(){
+    let revert = false
     const end = (await fullNodeService.getBlockchainState()).blockchain_state.peak.height +1;
     let start = await getLastRecordHeight()+1;
 
@@ -18,20 +19,50 @@ export async function checkForNewTransactions(){
     //To work with smaller payload process all blocks 100 at a time
     while(tempEnd <= end){
         const blocks = (await fullNodeService.getBlocksInRange(start,tempEnd)).blocks;
-        
+
+        revert = false;
+
         for(let block of blocks){
+
+            if(revert) break; //Breaking the addition of new transactions if revert is needed
+
             if(block.reward_chain_block.is_transaction_block){
-                const transactions = await fullNodeService.getAdditionsAndRemovals(block.header_hash || "");
-                if(transactions.success && !transactions.error){
-                    await addAdditionTransactions(transactions.additions)
-                        .catch(err => {Logger.Err(err.message)});
-                    
-                }
+                await fullNodeService.getAdditionsAndRemovals(block.header_hash || "")
+                    .then(async (transactions) => {
+                        if(transactions.success && !transactions.error){
+                            await addAdditionTransactions(transactions.additions)
+                                .catch(err => {Logger.Err(err.message)});
+                        }
+                    })
+                    .catch(async(err) => {
+                        if(err.message.includes(" ")){
+                            //Reverting 10 blocks
+                            start -= 10;
+                            revert = true;
+                            await removeTransactionsAfterHeight(start);
+                            
+                        }else{
+                            throw new HttpException(500, err.message);
+                        }
+                    });
+                
             }
         }
+        
+        if(revert)continue; //Preventing from changing the start if revert is needed
+
         start = tempEnd; 
          
         tempEnd+= (end - tempEnd<100 && end-tempEnd>0)? (end-tempEnd) : 100;
+    }
+}
+
+async function removeTransactionsAfterHeight(height: number){
+    const transactions = await Transaction.find()
+                                            .where("confirmation_block")
+                                            .gte(height)
+    for(let transaction of transactions){
+        await transaction.remove()
     }
 }
 
