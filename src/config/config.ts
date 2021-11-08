@@ -15,7 +15,7 @@ const FULLNODE_CERTPATH = process.env.FULLNODE_CERTPATH || "";
 const FULLNODE_KEYPATH = process.env.FULLNODE_KEYPATH || "";
 const FULLNODE_PORT = +(process.env.FULLNODE_PORT?.toString() || "") || 8855;
 const FULLNODE_HOST = process.env.FULLNODE_HOST || "localhost";
-
+const FULLNODE_CACERTPATH = process.env.FULLNODE_CACERTPATH || "";
 
 const Server = {
     port: SERVER_PORT,
@@ -33,6 +33,7 @@ const DB = {
 const FULLNODE = {
     host: FULLNODE_HOST,
     port: FULLNODE_PORT,
+    caCertPath: FULLNODE_CACERTPATH,
     certPath: FULLNODE_CERTPATH,
     keyPath: FULLNODE_KEYPATH
 }
