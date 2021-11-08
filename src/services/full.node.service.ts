@@ -22,7 +22,7 @@ async function delay(ms: number) {
 
 export async function getBlockchainState(){
     const blockchain:any = await fullNode().getBlockchainState()
-        .catch(err => {throw new HttpException(500, err.message+" here")});
+        .catch(err => {throw new HttpException(500, err.message)});
 
     if(!blockchain.success){
         throw new HttpException(500, blockchain.error || "");
@@ -41,6 +41,12 @@ export async function getBlocks(startHeight: number, endHeight: number){
     if(!blocks.success){
         throw new HttpException(404, blocks.error || "");
     }
+    for(let block of blocks.blocks){
+        if(block.header_hash?.toString().substring(0,2) !== "0x"){
+            block.header_hash = "0x".concat(block.header_hash?.toString() || "");
+        }
+    }
+
     return blocks;
 }
 
@@ -172,7 +178,7 @@ export async function find(searchId: any){
     //Check if the provided search ID is address
     if(searchId.toString().substring(0,3)==="cgn"){
         return {address:await getAddress(searchId.toString())};
-    }else if(searchId.toString().substring(0,2)==="0x"){ // FIXME create a better search
+    }else if(searchId.toString().substring(0,2)==="0x"){ 
         let searchedIsBlock = false;
         const transaction = await getTransaction(searchId.toString())
             .catch(err => {
@@ -180,7 +186,7 @@ export async function find(searchId: any){
                     searchedIsBlock = true;
                 }
             });
-        if(!searchedIsBlock){ //If 
+        if(!searchedIsBlock){ 
             return { transaction:transaction};
         }else{
             return await getBlockByHash(searchId.toString());
