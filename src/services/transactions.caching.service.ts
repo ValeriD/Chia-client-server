@@ -35,7 +35,7 @@ export async function checkForNewTransactions(){
                         }
                     })
                     .catch(async(err) => {
-                        if(err.message.includes(" ")){
+                        if(err.message.includes("is no longer in the blockchain")){
                             //Reverting 10 blocks
                             start -= 10;
                             revert = true;
