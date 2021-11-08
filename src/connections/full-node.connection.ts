@@ -12,6 +12,7 @@ export class FullNodeConnection{
             protocol: 'https',
             hostname: FULLNODE.host,
             port: FULLNODE.port,
+            caCertPath: FULLNODE.caCertPath,
             certPath:FULLNODE.certPath,
             keyPath:FULLNODE.keyPath
         });
