@@ -31,8 +31,8 @@ export async function removeTransactionFromAddress(transaction:ITransaction, isS
             $inc:{
                 total_sent: (isSend)? -1*transaction.amount : 0,
                 total_received: (!isSend)? -1*transaction.amount : 0,
-                current_balance: (isSend)? transaction.amount : transaction.amount,
-                number_of_transactions: 1
+                current_balance: (isSend)? transaction.amount : -1*transaction.amount,
+                number_of_transactions: -1
             },
             $pull:{
                 transactions:{
