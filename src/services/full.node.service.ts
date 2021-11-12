@@ -80,6 +80,7 @@ export async function getBlockByHeight(height:number){
     if(!record.success){
         throw new HttpException(500, record.error || "");
     }
+    record.block.header_hash = hash
     return record;
 }
 
