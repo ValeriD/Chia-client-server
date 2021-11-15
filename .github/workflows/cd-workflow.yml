@@ -1,0 +1,25 @@
+name: Create and publish a Docker image
+
+on:
+  push:
+    branches: ['master']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    name: Docker Build, Tag, Push
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build container image
+      uses: docker/build-push-action@v1
+      with:
+        username: valerid
+        password: ${{secrets.PCKG_TOKEN}}
+        registry: docker.pkg.github.com
+        repository: valerid/chaingreen-explorer-backend/chaingreen-explorer-backend
+        tag_with_sha: true
