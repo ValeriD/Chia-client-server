@@ -9,7 +9,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build_and_test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,6 +28,7 @@ jobs:
             !dist/**/*.md
   build-and-push-image:
     runs-on: ubuntu-latest
+    needs: build
     name: Docker Build, Tag, Push
     steps:
     - name: Checkout
