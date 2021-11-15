@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "chia-client-install":"cd ./node_modules/chia-client && npm run build",
+    "chia-client-install": "cd ./node_modules/chia-client && npm run build",
     "devServer": "nodemon ./src/index.ts",
     "start": "sudo node dist/index.js",
     "build": "tsc --p ./"
@@ -25,13 +25,13 @@
     "chia-utils": "git+https://github.com/ValeriD/chia-utils#fix_for",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
     "jet-logger": "^1.0.6",
     "mongoose": "^5.13.3",
     "nodemon": "^2.0.9",
     "tsc": "^2.0.3",
-    "typescript": "^4.3.2",
-    "dotenv": "^10.0.0",
-    "express": "^4.17.1"
+    "typescript": "^4.3.2"
   },
   "devDependencies": {
     "@types/cron": "^1.7.3",
